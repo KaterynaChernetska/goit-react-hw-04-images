@@ -29,12 +29,11 @@ export class Modal extends Component {
     }
   };
   handleBackdropClick = event => {
-    console.log(event.currentTarget, event.target);
-
     if (event.currentTarget === event.target) {
       this.props.onClose();
     }
   };
+
   render() {
     return createPortal(
       <Overlay onClick={this.handleBackdropClick}>
