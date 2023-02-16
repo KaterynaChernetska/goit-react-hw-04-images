@@ -6,11 +6,7 @@ import PropTypes from 'prop-types';
 const modalRoot = document.querySelector('#modal-root');
 
 export const Modal = ({ largeSrc, altTags, onClose }) => {
-  const onModalClose = event => {
-    if (event.code === 'Escape') {
-      onClose();
-    }
-  };
+  
 
   const handleBackdropClick = event => {
     if (event.currentTarget === event.target) {
@@ -19,12 +15,19 @@ export const Modal = ({ largeSrc, altTags, onClose }) => {
   };
 
   useEffect(() => {
+
+    const onModalClose = event => {
+      if (event.code === 'Escape') {
+        onClose();
+      }
+    };
     window.addEventListener('keydown', onModalClose);
 
     return () => {
       window.removeEventListener('keydown', onModalClose);
     };
-  }, []);
+  }, [onClose]);
+
 
   return createPortal(
     <Overlay onClick={handleBackdropClick}>
