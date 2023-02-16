@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import {
   Searchcomponent,
   SearchForm,
@@ -9,52 +9,43 @@ import {
 import { FaSearch } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 
-export class Searchbar extends Component {
-  static propTypes = {
-    addSearchQuery: PropTypes.func.isRequired,
+export const Searchbar = ({ addSearchQuery }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleInputChange = ({ target }) => {
+    setSearchQuery(target.value.toLowerCase());
   };
 
-  state = {
-    searchQuery: '',
-  };
-
-  handleInputChange = ({ target }) => {
-    this.setState({
-      searchQuery: target.value.toLowerCase(),
-    });
-  };
-
-  handleSubmit = event => {
+  const handleSubmit = event => {
     event.preventDefault();
-    if (this.state.searchQuery.trim() === '') {
+    if (searchQuery.trim() === '') {
       return;
     }
-    this.props.addSearchQuery(this.state.searchQuery);
-
-    this.setState({
-      searchQuery: '',
-    });
+    addSearchQuery(searchQuery);
+    setSearchQuery('');
   };
 
-  render() {
-    return (
-      <Searchcomponent>
-        <SearchForm onSubmit={this.handleSubmit}>
-          <SearchFormButton type="submit">
-            <SearchFormButtonLabel>Search</SearchFormButtonLabel>
-            <FaSearch width="48" height="48" />
-          </SearchFormButton>
-          <SearchFormInput
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            name="searchQuery"
-            value={this.state.searchQuery}
-            onChange={this.handleInputChange}
-          />
-        </SearchForm>
-      </Searchcomponent>
-    );
-  }
-}
+  return (
+    <Searchcomponent>
+      <SearchForm onSubmit={handleSubmit}>
+        <SearchFormButton type="submit">
+          <SearchFormButtonLabel>Search</SearchFormButtonLabel>
+          <FaSearch width="48" height="48" />
+        </SearchFormButton>
+        <SearchFormInput
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          name="searchQuery"
+          value={searchQuery}
+          onChange={handleInputChange}
+        />
+      </SearchForm>
+    </Searchcomponent>
+  );
+};
+
+Searchbar.propTypes = {
+  addSearchQuery: PropTypes.func.isRequired,
+};

@@ -1,73 +1,82 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader } from './Loader/Loader';
 import { pixabayApi } from '../services/api';
 import { Button } from './Button/Button';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { AppContainer } from './App.styled';
+import { Modal } from './Modal/Modal';
 
-export class App extends Component {
-  state = {
-    images: [],
-    query: '',
-    isLoading: false,
-    page: 1,
-    error: null,
-    totalHits: 0,
-  };
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [query, setQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState(null);
+  const [totalHits, setTotalHits] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImgUrl, setLargeImgUrl] = useState('');
+  const [altTags, setAltTags] = useState('');
 
-  async componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
-    if (prevState.query !== query || prevState.page !== page) {
+  useEffect(() => {
+    if (!query) return;
+    const fetchImages = async () => {
       try {
-        this.setState({ isLoading: true });
+        setIsLoading(true);
         const images = await pixabayApi(query, page);
-        this.setState({ totalHits: images.totalHits });
+        setTotalHits(images.totalHits);
         const filteredData = images.hits.map(
           ({ id, webformatURL, largeImageURL, tags }) => ({
             id,
             webformatURL,
             largeImageURL,
-            tags
+            tags,
           })
         );
-        this.setState(prevState => ({
-          images: [...prevState.images, ...filteredData],
-        }));
+        setImages(prevState => [...prevState, ...filteredData]);
       } catch (error) {
-        this.setState({ error: error.message });
+        setError(error.message);
       } finally {
-        this.setState({ isLoading: false });
+        setIsLoading(false);
       }
-    }
-  }
+    };
+    fetchImages();
+  }, [query, page]);
 
-
-  handleFormSubmit = searchQuery => {
-    if (this.state.query !== searchQuery) {
-      this.setState({ query: searchQuery, images: [], page: 1, totalHits: 0 });
+  const handleFormSubmit = searchQuery => {
+    if (query !== searchQuery) {
+      setQuery(searchQuery);
+      setImages([]);
+      setPage(1);
     }
   };
 
-  handleClick = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const handleClick = () => {
+    setPage(prevState => prevState + 1);
   };
 
-  render() {
-    const { isLoading, error, images, totalHits } = this.state;
-    return (
-      <AppContainer>
-        <Searchbar addSearchQuery={this.handleFormSubmit} />
-        {isLoading && <Loader />}
-        {error !== null && <p>Oops, some error occured... Message: {error}</p>}
-        {<ImageGallery images={images} toggleModal={this.toggleModal}/>}
-        {images.length > 0 && images.length < totalHits && (
-          <Button onClickBtn={this.handleClick}>Load More</Button>
+  const handleImgClick = (imgUrl, alt) => {
+    setShowModal(true);
+    setLargeImgUrl(imgUrl);
+    setAltTags(alt);
+  };
 
-        )}
-      </AppContainer>
-    );
-  }
-}
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  return (
+    <AppContainer>
+      <Searchbar addSearchQuery={handleFormSubmit} />
+      {isLoading && <Loader />}
+      {error !== null && <p>Oops, some error occured... Message: {error}</p>}
+      {<ImageGallery images={images} onElClick={handleImgClick} />}
+      {images.length > 0 && images.length < totalHits && (
+        <Button onClickBtn={handleClick}>Load More</Button>
+      )}
+      {showModal && (
+        <Modal largeSrc={largeImgUrl} onClose={closeModal} altTags={altTags} />
+      )}
+    </AppContainer>
+  );
+};

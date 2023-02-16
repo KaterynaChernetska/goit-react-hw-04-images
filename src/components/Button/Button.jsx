@@ -1,17 +1,15 @@
-import { Component } from 'react';
 import { LoadMoreBtn } from './Button.styled';
 import PropTypes from 'prop-types';
 
-export class Button extends Component {
-  static propTypes = {
-    onClickBtn: PropTypes.func.isRequired,
-  };
+export const Button = ({ onClickBtn, children }) => {
+  return (
+    <LoadMoreBtn type="button" onClick={onClickBtn}>
+      {children}
+    </LoadMoreBtn>
+  );
+};
 
-  render() {
-    return (
-      <LoadMoreBtn type="button" onClick={this.props.onClickBtn}>
-        {this.props.children}
-      </LoadMoreBtn>
-    );
-  }
-}
+Button.propTypes = {
+  onClickBtn: PropTypes.func.isRequired,
+  children: PropTypes.string.isRequired,
+};

@@ -2,7 +2,7 @@ import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Container } from './ImageGallery.styled';
 import PropTypes from 'prop-types';
 
-export const ImageGallery = ({ images }) => {
+export const ImageGallery = ({ images, onElClick }) => {
   return (
     <Container>
       {images.length > 0 &&
@@ -12,6 +12,7 @@ export const ImageGallery = ({ images }) => {
             smallSrc={el.webformatURL}
             largeSrc={el.largeImageURL}
             alt={el.tags}
+            onImgClick={onElClick}
           ></ImageGalleryItem>
         ))}
     </Container>
