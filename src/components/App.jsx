@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Loader } from './Loader/Loader';
 import { pixabayApi } from '../services/api';
 import { Button } from './Button/Button';
@@ -8,6 +8,9 @@ import { AppContainer } from './App.styled';
 import { Modal } from './Modal/Modal';
 
 export const App = () => {
+
+  const firstRender = useRef(true);
+
   const [images, setImages] = useState([]);
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,8 +21,17 @@ export const App = () => {
   const [largeImgUrl, setLargeImgUrl] = useState('');
   const [altTags, setAltTags] = useState('');
 
+// Contect, кастомний хук забирання з локал сторадж (отримує ключ до локал і повертає стйейт)
   useEffect(() => {
-    if (!query) return;
+    // if (!query) return;
+    // console.log(firstRender.current)
+    if(firstRender.current){
+      console.log('first render do smth');
+      setQuery('cat');
+      firstRender.current = false;
+      return;
+    } 
+      console.log('second render');  
     const fetchImages = async () => {
       try {
         setIsLoading(true);
@@ -40,7 +52,7 @@ export const App = () => {
         setIsLoading(false);
       }
     };
-    fetchImages();
+    fetchImages(); 
   }, [query, page]);
 
   const handleFormSubmit = searchQuery => {

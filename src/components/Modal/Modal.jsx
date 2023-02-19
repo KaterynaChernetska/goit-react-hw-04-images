@@ -21,6 +21,7 @@ export const Modal = ({ largeSrc, altTags, onClose }) => {
         onClose();
       }
     };
+    
     window.addEventListener('keydown', onModalClose);
 
     return () => {
